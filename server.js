@@ -32,6 +32,6 @@ app.ws('/', (ws, req) => {
     })
 })  
 
-app.listen(3000, () => {
-    console.log('Drawing app is ready')
+app.listen(process.env.PORT || 3000, () => {
+    console.log(`Drawing app on ${process.env.PORT || 3000} is ready for connections`)
 })
