@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas></canvas>
+        <script>
+            const [canvas] = document.getElementsByTagName('canvas')
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            
+            let pendown = false
+            let myColor
+            let x = 0
+            let y = 0
+
+            const ctx = canvas.getContext('2d')
+            
+            const ws = new WebSocket('ws://localhost:3000/')
+            
+            ws.onmessage = msg => {
+                if (msg.data.includes('COLOR')) {
+                    myColor = msg.data.split('|')[1]
+                } else {
+                    const state = JSON.parse(msg.data)
+
+                    Object.keys(state).forEach(clientColor => {
+                        const [fromX, fromY, toX, toY] = state[clientColor]
+                        ctx.strokeStyle = clientColor
+                        ctx.beginPath()
+                        ctx.moveTo(fromX, fromY)
+                        ctx.lineTo(toX, toY)
+                        ctx.stroke()
+                    })
+                }
+            }
+            
+            
+            document.onmousedown = (event) => {
+                pendown = true
+                x = event.clientX
+                y = event.clientY
+            }
+            document.onmouseup = () => {
+                pendown = false
+            }
+            document.onmousemove = (event) => {
+                if (pendown) {
+                    const {clientX, clientY} = event
+                    const msg = [myColor, x, y, clientX, clientY].join('|')
+                    ws.send(msg)
+                    x = clientX
+                    y = clientY
+                }
+            }
+        </script>
+    </body>
+</html>
