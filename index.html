@@ -22,7 +22,7 @@
 
             const ctx = canvas.getContext('2d')
             
-            const ws = new WebSocket('ws://localhost:3000/')
+            const ws = new WebSocket('ws://swe-drawing-workshop.herokuapp.com/')
             
             ws.onmessage = msg => {
                 if (msg.data.includes('COLOR')) {
